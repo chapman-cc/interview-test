@@ -11,16 +11,12 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import { Formik } from "formik";
+import { useRouter } from "next/navigation";
 import { useLocalStorage } from "usehooks-ts";
-
-type LoginFields = {
-  username: string;
-  password: string;
-};
 
 export default function LoginForm() {
   const [token, saveToken] = useLocalStorage("TOKEN", null);
-
+  const router = useRouter();
   return (
     <Formik
       initialValues={{ username: "", password: "" }}
@@ -29,7 +25,8 @@ export default function LoginForm() {
         const body = JSON.stringify(values);
         fetch("http://localhost:3000/api/login", { method, body })
           .then((res) => res.json())
-          .then(({ token }) => saveToken(token));
+          .then(({ token }) => saveToken(token))
+          .then(() => router.push("/profile"));
       }}
     >
       {({

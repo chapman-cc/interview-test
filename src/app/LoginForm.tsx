@@ -14,6 +14,7 @@ import {
 import { error } from "console";
 import { Formik, FormikConfig } from "formik";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
 type LoginForm = {
@@ -41,6 +42,12 @@ export default function LoginForm() {
       setErrors({ username: "Incorrect", password: "Incorrect" });
     }
   };
+
+  useEffect(() => {
+    if (token) {
+      router.push("/profile");
+    }
+  }, []);
   return (
     <Formik<LoginForm>
       initialValues={{ username: "", password: "" }}

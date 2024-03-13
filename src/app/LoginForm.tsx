@@ -9,28 +9,42 @@ import {
   FormControl,
   FormLabel,
   Flex,
+  FormHelperText,
 } from "@chakra-ui/react";
-import { Formik } from "formik";
+import { error } from "console";
+import { Formik, FormikConfig } from "formik";
 import { useRouter } from "next/navigation";
 import { useLocalStorage } from "usehooks-ts";
+
+type LoginForm = {
+  username: string;
+  password: string;
+};
 
 export default function LoginForm() {
   const [token, saveToken] = useLocalStorage("TOKEN", null);
   const router = useRouter();
+
+  const handleSubmit: FormikConfig<LoginForm>["onSubmit"] = async (
+    values,
+    { setErrors }
+  ) => {
+    const url = "http://localhost:3000/api/login";
+    const method = "POST";
+    const body = JSON.stringify(values);
+    const res = await fetch(url, { method, body });
+    if (res.ok) {
+      const { token } = await res.json();
+      saveToken(token);
+      router.push("/profile");
+    } else {
+      setErrors({ username: "Incorrect", password: "Incorrect" });
+    }
+  };
   return (
-    <Formik
+    <Formik<LoginForm>
       initialValues={{ username: "", password: "" }}
-      onSubmit={async (values, {}) => {
-        const url = "http://localhost:3000/api/login";
-        const method = "POST";
-        const body = JSON.stringify(values);
-        const res = await fetch(url, { method, body });
-        if (res.ok) {
-          const { token } = await res.json();
-          saveToken(token);
-          router.push("/profile");
-        }
-      }}
+      onSubmit={handleSubmit}
     >
       {({
         values,
@@ -40,7 +54,6 @@ export default function LoginForm() {
         handleSubmit,
         isSubmitting,
         isValid,
-        /* and other goodies */
       }) => (
         <Box
           maxW="max-content"
@@ -52,11 +65,13 @@ export default function LoginForm() {
           <Text fontSize={"larger"} align={"center"}>
             <Text as="b">Login</Text>
           </Text>
-
           <Box pt={6}>
             <form onSubmit={handleSubmit}>
               <VStack spacing={6}>
-                <FormControl isRequired isInvalid={!isValid}>
+                <FormControl
+                  isRequired
+                  isInvalid={errors.username !== undefined}
+                >
                   <Flex align="center">
                     <FormLabel htmlFor="username">UserName:</FormLabel>
                     <Input
@@ -66,8 +81,12 @@ export default function LoginForm() {
                       value={values.username}
                     />
                   </Flex>
+                  <FormHelperText>{errors.username}</FormHelperText>
                 </FormControl>
-                <FormControl isRequired isInvalid={!isValid}>
+                <FormControl
+                  isRequired
+                  isInvalid={errors.password !== undefined}
+                >
                   <Flex align="center">
                     <FormLabel htmlFor="password">Password:</FormLabel>
                     <Input
@@ -78,6 +97,7 @@ export default function LoginForm() {
                       value={values.password}
                     />
                   </Flex>
+                  <FormHelperText>{errors.password}</FormHelperText>
                 </FormControl>
                 <Button
                   colorScheme="blue"

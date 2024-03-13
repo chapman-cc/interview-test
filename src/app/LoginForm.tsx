@@ -20,13 +20,16 @@ export default function LoginForm() {
   return (
     <Formik
       initialValues={{ username: "", password: "" }}
-      onSubmit={(values, {}) => {
+      onSubmit={async (values, {}) => {
+        const url = "http://localhost:3000/api/login";
         const method = "POST";
         const body = JSON.stringify(values);
-        fetch("http://localhost:3000/api/login", { method, body })
-          .then((res) => res.json())
-          .then(({ token }) => saveToken(token))
-          .then(() => router.push("/profile"));
+        const res = await fetch(url, { method, body });
+        if (res.ok) {
+          const { token } = await res.json();
+          saveToken(token);
+          router.push("/profile");
+        }
       }}
     >
       {({

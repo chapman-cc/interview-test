@@ -11,7 +11,6 @@ import {
   Flex,
   FormHelperText,
 } from "@chakra-ui/react";
-import { error } from "console";
 import { Formik, FormikConfig } from "formik";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -60,14 +59,16 @@ export default function LoginForm() {
         handleBlur,
         handleSubmit,
         isSubmitting,
-        isValid,
       }) => (
         <Box
           maxW="max-content"
           borderWidth={1}
           borderRadius="lg"
           overflow="hidden"
-          p={3}
+          px={10}
+          py={3}
+          bg="white"
+          boxShadow={"2xl"}
         >
           <Text fontSize={"larger"} align={"center"}>
             <Text as="b">Login</Text>

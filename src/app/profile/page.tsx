@@ -1,13 +1,13 @@
 "use client";
 
-import { Box, Text } from "@chakra-ui/react";
+import { Box, Text, Button } from "@chakra-ui/react";
 import Field from "./Field";
 import { useLocalStorage } from "usehooks-ts";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function Profile() {
-  const [token] = useLocalStorage("TOKEN", null);
+  const [token, saveToken] = useLocalStorage("TOKEN", null);
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const router = useRouter();
@@ -30,6 +30,11 @@ export default function Profile() {
     }
   }
 
+  const handleLogout = () => {
+    saveToken(null);
+    router.push("/");
+  };
+
   useEffect(() => {
     if (token === null) {
       router.push("/");
@@ -42,6 +47,15 @@ export default function Profile() {
       <Text fontSize="2xl">Profile</Text>
       <Field label="Name">{name}</Field>
       <Field label="Email">{email}</Field>
+
+      <Button
+        type="button"
+        colorScheme="red"
+        variant="outline"
+        onClick={handleLogout}
+      >
+        Logout
+      </Button>
     </Box>
   );
 }
